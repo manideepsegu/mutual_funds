@@ -165,7 +165,7 @@ sub processCAMS {
 
   open(CSV, ">", $csv) or die $!;
   
-  print CSV "Fund Name, Total Invested, CAMS Value, Units, Increase %\n";
+  print CSV "Fund Name, Total Invested, CAMS Value, Present Value, Increase %\n";
   foreach my $fund (keys %fund) {
     if($fund{$fund}{units}) {
       print CSV $latestNav->{$fund}{name};
