@@ -1,4 +1,4 @@
-# mutual_funds
+# Mutual Fund Summary
 Perl code to get latest NAVs, process CAMS PDF and generate a CSV summary
 
 Required Perl Modules:
@@ -21,4 +21,4 @@ Example:
 
 CAMS Statement can be downloaded from:
 - https://www.camsonline.com/COL_InvestorServices.aspx 
-- (MailBackServices -> Consolidated Account Statement - CAMS+Karvy+FTAMIL+SBFS -> Detailed Statement with long period).
+- (MailBackServices -> Consolidated Account Statement - CAMS+Karvy+FTAMIL+SBFS -> Detailed Statement with long time period).
