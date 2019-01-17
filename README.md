@@ -18,3 +18,5 @@ Options:
 
 Example:
 - mutual_funds.pl -cams CAMS.pdf -pwd qwerty -csv latest_summary.csv
+
+CAMS Statement can be downloaded from https://www.camsonline.com/InvestorServices/COL_ISAccountStatementCKF.aspx (Detailed Statement).
