@@ -8,3 +8,10 @@ Required Perl Modules:
  
 Unix:
 - pdftotext
+
+Options:
+- url       =>      Specify different URL for latest NAVs other than AMF
+- cams      =>      Path for the CAMS PDF file. Defaults to \$HOME/CAMS.pdf
+- pwd       =>      Password for CAMS PDF. Defaults to 123456
+- csv       =>      Path for final CSV file. Defaults to \$HOME/mutual_funds.csv
+- help      =>      Print this message
