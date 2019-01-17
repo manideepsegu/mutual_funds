@@ -7,12 +7,39 @@ use Getopt::Long;
 use Data::Dumper;
 use LWP::Simple qw(get);
 
+my $url  = "https://www.amfiindia.com/spages/NAVAll.txt";
+my $cams = "$ENV{HOME}/CAMS.pdf";
+my $pwd  = "9916663771";
+my $csv  = "$ENV{HOME}/mutual_funds.csv";
+my $textFile;
+
+GetOptions ("url=s"       => \$url, 
+            "cams=s"      => \$cams,
+            "pwd=s"       => \$pwd,
+            "csv=s"       => \$csv,
+            "help"        => \&help_msg)
+or help_msg();
+
+sub help_msg {
+  print "\n==============================================================================================\n";
+  print "===================================   mutual_funds.pl   ======================================\n";
+  print "==============================================================================================\n\n";
+  print "Script to process latest NAV from AMF website and process CAMS file to generate a CSV summary\n\n";
+  print "Options:\n";
+  print "url       =>      Specify different URL for latest NAVs other than AMF\n";
+  print "cams      =>      Path for the CAMS PDF file. Defaults to \$HOME/CAMS.pdf\n";
+  print "pwd       =>      Password for CAMS PDF. Defaults to 123456\n";
+  print "csv       =>      Path for final CSV file. Defaults to \$HOME/mutual_funds.csv\n";
+  print "help      =>      Print this message\n";
+  print "Contact: Manideep Segu (msegu\@gmail.com)\n\n";
+  exit 1;
+}
+
 my ($latestNav, $codeMapping) = getLatestNAV();
 
-processCAMS("$ENV{HOME}/CAMS.pdf", $latestNav, $codeMapping);
+processCAMS($cams, $latestNav, $codeMapping);
 
 sub getLatestNAV {
-  my $url = "https://www.amfiindia.com/spages/NAVAll.txt";
   my @navall = split /\n/, get $url;
   @navall = grep !/^\s*$/, @navall;
   chomp @navall;
@@ -67,12 +94,14 @@ sub getLatestNAV {
 sub processCAMS {
   my ($camsPdf, $latestNav, $codeMapping) = @_;
 
-  system("pdftotext -raw -q -upw 9916663771 $camsPdf");
-  
-  my $camsPdfNoext = $camsPdf;
-  $camsPdfNoext =~ s/.pdf//;
+  if(not defined $textFile) {
+    $textFile = $camsPdf;
+    $textFile =~ s/.pdf//;
+  }
 
-  open(FILE, "<", "$camsPdfNoext.txt") or die $!;
+  system("pdftotext -raw -q -upw $pwd $camsPdf $textFile");
+  
+  open(FILE, "<", $textFile) or die $!;
   
   my @text;
   
@@ -134,7 +163,7 @@ sub processCAMS {
     $i++;
   }
 
-  open CSV, ">", "$ENV{HOME}/mutual_funds.csv";
+  open(CSV, ">", $csv) or die $!;
   
   print CSV "Fund Name, Total Invested, CAMS Value, Units, Increase %\n";
   foreach my $fund (keys %fund) {
