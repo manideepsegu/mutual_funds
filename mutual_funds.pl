@@ -9,7 +9,7 @@ use LWP::Simple qw(get);
 
 my $url  = "https://www.amfiindia.com/spages/NAVAll.txt";
 my $cams = "$ENV{HOME}/CAMS.pdf";
-my $pwd  = "9916663771";
+my $pwd  = "123456";
 my $csv  = "$ENV{HOME}/mutual_funds.csv";
 my $textFile;
 
