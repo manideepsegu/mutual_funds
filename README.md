@@ -1,5 +1,5 @@
 # mutual_funds
-Perl code to get latest NAVs and process CAMS PDF and generate a CSV summary
+Perl code to get latest NAVs, process CAMS PDF and generate a CSV summary
 
 Required Perl Modules:
 - Getopt::Long
@@ -15,3 +15,6 @@ Options:
 - pwd       =>      Password for CAMS PDF. Defaults to 123456
 - csv       =>      Path for final CSV file. Defaults to \$HOME/mutual_funds.csv
 - help      =>      Print this message
+
+Example:
+- mutual_funds.pl -cams CAMS.pdf -pwd qwerty -csv latest_summary.csv
