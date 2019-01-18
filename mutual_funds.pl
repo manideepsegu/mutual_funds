@@ -21,17 +21,16 @@ GetOptions ("url=s"       => \$url,
 or help_msg();
 
 sub help_msg {
-  print "\n==============================================================================================\n";
-  print "===================================   mutual_funds.pl   ======================================\n";
-  print "==============================================================================================\n\n";
+  print "\n===================================   mutual_funds.pl   ======================================\n\n";
   print "Script to process latest NAV from AMF website and process CAMS file to generate a CSV summary\n\n";
   print "Options:\n";
-  print "url       =>      Specify different URL for latest NAVs other than AMF\n";
-  print "cams      =>      Path for the CAMS PDF file. Defaults to \$HOME/CAMS.pdf\n";
-  print "pwd       =>      Password for CAMS PDF. Defaults to 123456\n";
-  print "csv       =>      Path for final CSV file. Defaults to \$HOME/mutual_funds.csv\n";
-  print "help      =>      Print this message\n";
-  print "Contact: Manideep Segu (msegu\@gmail.com)\n\n";
+  print "\turl       =>      Specify different URL for latest NAVs other than AMF (Optional)\n";
+  print "\tcams      =>      Path for the CAMS PDF file. Defaults to \$HOME/CAMS.pdf\n";
+  print "\tpwd       =>      Password for CAMS PDF. Defaults to 123456\n";
+  print "\tcsv       =>      Path for final CSV file. Defaults to \$HOME/mutual_funds.csv\n";
+  print "\thelp      =>      Print this message\n";
+  print "\nExample:\n\tperl mutual_funds.pl -cams CAMS.pdf -pwd qwerty -csv latest_summary.csv\n";
+  print "\nContact:\n\tManideep Segu (msegu\@gmail.com)\n\n";
   exit 1;
 }
 
