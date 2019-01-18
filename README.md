@@ -22,3 +22,8 @@ Example:
 CAMS Statement can be downloaded from:
 - https://www.camsonline.com/COL_InvestorServices.aspx 
 - (MailBackServices -> Consolidated Account Statement - CAMS+Karvy+FTAMIL+SBFS -> Detailed Statement with long time period).
+
+Future Enhancements:
+- Move URL parsing and CSV generation functions to Perl Modules
+- Add options to keep track of NAVs for each day
+- Enhance generation of CSV to XLS for better readability
