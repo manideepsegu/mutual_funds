@@ -35,6 +35,12 @@ sub help_msg {
   exit 1;
 }
 
+my @months = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
+
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+$year = $year+1900;
+my $today="$mday-$months[$mon]-$year";
+
 my ($latestNav, $codeMapping) = getLatestNAV();
 
 processCAMS($cams, $latestNav, $codeMapping);
@@ -93,6 +99,7 @@ sub getLatestNAV {
 
 sub processCAMS {
   my ($camsPdf, $latestNav, $codeMapping) = @_;
+  my $fundDate;
 
   if(not defined $textFile) {
     $textFile = $camsPdf;
@@ -150,7 +157,7 @@ sub processCAMS {
       }
     }
     if($txt =~ /Valuation on ([0-3][0-9]-\w+-\d\d\d\d): INR ([\d,.()]+)/) {
-      my $date = $1;
+      $fundDate = $1;
       my $amount = $2;
       $amount =~ s/,//;
       $fund{$fund_code}{present_value} += $amount;
@@ -183,7 +190,7 @@ sub processCAMS {
   $props{align} = 'center',
   my $formatHeader = $workbook->add_format(%props);
 
-  my @headers = ("Fund Name", "Invested", "CAMS Value", "Present Value", "Increase");
+  my @headers = ("Fund Name", "Invested", "CAMS Value ($fundDate)", "Present Value ($today)", "Increase");
   my $row = 0;
   my $column = 0;
   $worksheet->write($row, $column, \@headers, $formatHeader);
@@ -210,9 +217,9 @@ sub processCAMS {
   $worksheet->write(0, 9, 'Total Increase', $formatHeader);
   $worksheet->write(1, 9, '=(I2-H2)*100/H2', $format);
   $worksheet->set_column('A:A', 80);
-  $worksheet->set_column('B:B', 15);
-  $worksheet->set_column('C:C', 15);
-  $worksheet->set_column('D:D', 15);
+  $worksheet->set_column('B:B', 24);
+  $worksheet->set_column('C:C', 24);
+  $worksheet->set_column('D:D', 24);
   $worksheet->set_column('E:E', 12);
   $worksheet->set_column('H:H', 15);
   $worksheet->set_column('I:I', 15);
