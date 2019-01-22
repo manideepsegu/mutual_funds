@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Excel::Writer::XLSX;
 use Getopt::Long;
 use Data::Dumper;
 use LWP::Simple qw(get);
@@ -10,26 +11,26 @@ use LWP::Simple qw(get);
 my $url  = "https://www.amfiindia.com/spages/NAVAll.txt";
 my $cams = "$ENV{HOME}/CAMS.pdf";
 my $pwd  = "123456";
-my $csv  = "$ENV{HOME}/mutual_funds.csv";
+my $csv  = "$ENV{HOME}/mutual_funds.xlsx";
 my $textFile;
 
 GetOptions ("url=s"       => \$url, 
             "cams=s"      => \$cams,
             "pwd=s"       => \$pwd,
-            "csv=s"       => \$csv,
+            "xlsx=s"      => \$csv,
             "help"        => \&help_msg)
 or help_msg();
 
 sub help_msg {
   print "\n===================================   mutual_funds.pl   ======================================\n\n";
-  print "Script to process latest NAV from AMF website and process CAMS file to generate a CSV summary\n\n";
+  print "Script to process latest NAV from AMF website and process CAMS file to generate a XLS summary\n\n";
   print "Options:\n";
   print "\turl       =>      Specify different URL for latest NAVs other than AMF (Optional)\n";
   print "\tcams      =>      Path for the CAMS PDF file. Defaults to \$HOME/CAMS.pdf\n";
   print "\tpwd       =>      Password for CAMS PDF. Defaults to 123456\n";
-  print "\tcsv       =>      Path for final CSV file. Defaults to \$HOME/mutual_funds.csv\n";
+  print "\txlsx      =>      Path for final XLSX file. Defaults to \$HOME/mutual_funds.xlsx\n";
   print "\thelp      =>      Print this message\n";
-  print "\nExample:\n\tperl mutual_funds.pl -cams CAMS.pdf -pwd qwerty -csv latest_summary.csv\n";
+  print "\nExample:\n\tperl mutual_funds.pl -cams CAMS.pdf -pwd qwerty -xlsx latest_summary.xlsx\n";
   print "\nContact:\n\tManideep Segu (msegu\@gmail.com)\n\n";
   exit 1;
 }
@@ -162,25 +163,61 @@ sub processCAMS {
     $i++;
   }
 
-  open(CSV, ">", $csv) or die $!;
-  
-  print CSV "Fund Name, Total Invested, CAMS Value, Present Value, Increase %\n";
+  # Create a new Excel workbook
+  my $workbook = Excel::Writer::XLSX->new( $csv ) or die $!;
+
+  # Add a worksheet
+  my $worksheet = $workbook->add_worksheet("Summary");
+
+  #  Add and define a format
+  my %props = (
+    bold    => 0,
+    border  => 1,
+    bottom  => 1,
+    top     => 1,
+    left    => 1,
+    right   => 1
+  );
+  my $format = $workbook->add_format(%props);
+  $props{bold}  = 1;
+  $props{align} = 'center',
+  my $formatHeader = $workbook->add_format(%props);
+
+  my @headers = ("Fund Name", "Invested", "CAMS Value", "Present Value", "Increase");
+  my $row = 0;
+  my $column = 0;
+  $worksheet->write($row, $column, \@headers, $formatHeader);
   foreach my $fund (keys %fund) {
+    $row++;
     if($fund{$fund}{units}) {
-      print CSV $latestNav->{$fund}{name};
-      print CSV ",";
-      print CSV $fund{$fund}{total_value};
-      print CSV ",";
-      print CSV $fund{$fund}{present_value};
-      print CSV ",";
-      print CSV sprintf("%.2f",$fund{$fund}{units}*$latestNav->{$fund}{nav});
-      print CSV ",";
-      print CSV sprintf("%.2f",100*(($fund{$fund}{units}*$latestNav->{$fund}{nav})-$fund{$fund}{total_value})/$fund{$fund}{total_value});
-      print CSV "\n";
+      $worksheet->write( $row, $column, $latestNav->{$fund}{name}, $format );
+      $column++;
+      $worksheet->write( $row, $column, sprintf('%.2f',$fund{$fund}{total_value}), $format );
+      $column++;
+      $worksheet->write( $row, $column, sprintf('%.2f',$fund{$fund}{present_value}), $format );
+      $column++;
+      $worksheet->write( $row, $column, sprintf('%.2f',$fund{$fund}{units}*$latestNav->{$fund}{nav}), $format );
+      $column++;
+      $worksheet->write( $row, $column, sprintf('%.2f',100*(($fund{$fund}{units}*$latestNav->{$fund}{nav})-$fund{$fund}{total_value})/$fund{$fund}{total_value}), $format );
+      $column++;
     }
+    $column = 0;
   }
-  
-  close CSV;
+  $worksheet->write(0, 7, 'Total Invested', $formatHeader);
+  $worksheet->write(1, 7, '=sum(B:B)', $format);
+  $worksheet->write(0, 8, 'Total Value', $formatHeader);
+  $worksheet->write(1, 8, '=sum(C:C)', $format);
+  $worksheet->write(0, 9, 'Total Increase', $formatHeader);
+  $worksheet->write(1, 9, '=(I2-H2)*100/H2', $format);
+  $worksheet->set_column('A:A', 80);
+  $worksheet->set_column('B:B', 15);
+  $worksheet->set_column('C:C', 15);
+  $worksheet->set_column('D:D', 15);
+  $worksheet->set_column('E:E', 12);
+  $worksheet->set_column('H:H', 15);
+  $worksheet->set_column('I:I', 15);
+  $worksheet->set_column('J:J', 12);
+  $workbook->close();
 }
 
 sub getFundCode {
