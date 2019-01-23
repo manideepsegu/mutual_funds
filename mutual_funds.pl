@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Excel::Writer::XLSX;
+use Excel::Writer::XLSX::Utility;
 use Getopt::Long;
 use Data::Dumper;
 use LWP::Simple qw(get);
@@ -190,13 +191,19 @@ sub processCAMS {
   $props{align} = 'center',
   my $formatHeader = $workbook->add_format(%props);
 
-  my @headers = ("Fund Name", "Invested", "CAMS Value ($fundDate)", "Present Value ($today)", "Increase");
+  my @headers = ("Fund Code", "Fund Name", "Invested", "CAMS Value ($fundDate)", "Present Value ($today)", "Increase");
+  my @width   = (10         , 80         , 24        , 24                      , 24                      , 12        );
   my $row = 0;
   my $column = 0;
   $worksheet->write($row, $column, \@headers, $formatHeader);
+  for(my $i=0; $i<=$#headers; $i++) {
+    $worksheet->set_column($i,$i,$width[$i]);
+  }
   foreach my $fund (keys %fund) {
     $row++;
     if($fund{$fund}{units}) {
+      $worksheet->write( $row, $column, $fund, $format );
+      $column++;
       $worksheet->write( $row, $column, $latestNav->{$fund}{name}, $format );
       $column++;
       $worksheet->write( $row, $column, sprintf('%.2f',$fund{$fund}{total_value}), $format );
@@ -210,20 +217,17 @@ sub processCAMS {
     }
     $column = 0;
   }
-  $worksheet->write(0, 7, 'Total Invested', $formatHeader);
-  $worksheet->write(1, 7, '=sum(B:B)', $format);
-  $worksheet->write(0, 8, 'Total Value', $formatHeader);
-  $worksheet->write(1, 8, '=sum(C:C)', $format);
-  $worksheet->write(0, 9, 'Total Increase', $formatHeader);
-  $worksheet->write(1, 9, '=(I2-H2)*100/H2', $format);
-  $worksheet->set_column('A:A', 80);
-  $worksheet->set_column('B:B', 24);
-  $worksheet->set_column('C:C', 24);
-  $worksheet->set_column('D:D', 24);
-  $worksheet->set_column('E:E', 12);
-  $worksheet->set_column('H:H', 15);
-  $worksheet->set_column('I:I', 15);
-  $worksheet->set_column('J:J', 12);
+  my $investedCol = xl_col_to_name(array_search("Invested", @headers));
+  my $presentCol = xl_col_to_name(array_search("Present Value ($today)", @headers));
+  $worksheet->write(0, $#headers+2, 'Total Invested', $formatHeader);
+  $worksheet->write(1, $#headers+2, sprintf('=sum(%s:%s)', $investedCol, $investedCol), $format);
+  $worksheet->write(0, $#headers+3, 'Total Value', $formatHeader);
+  $worksheet->write(1, $#headers+3, sprintf('=sum(%s:%s)', $presentCol, $presentCol), $format);
+  $worksheet->write(0, $#headers+4, 'Total Increase', $formatHeader);
+  $worksheet->write(1, $#headers+4, sprintf("=(%s2-%s2)*100/%s2", xl_col_to_name($#headers+3), xl_col_to_name($#headers+2), xl_col_to_name($#headers+2)), $format);
+  $worksheet->set_column($#headers+2, $#headers+1, 15);
+  $worksheet->set_column($#headers+3, $#headers+2, 15);
+  $worksheet->set_column($#headers+4, $#headers+3, 12);
   $workbook->close();
 }
 
@@ -278,4 +282,14 @@ sub numMatches {
     }
   }
   return $match*100/($#fund2+1);
+}
+
+sub array_search {
+  my ($element, @array) = @_;
+  foreach (0..$#array) {
+    if ($array[$_] eq $element) 
+    { 
+      return $_; 
+    } 
+  } return -1;	
 }
