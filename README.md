@@ -25,6 +25,5 @@ CAMS Statement can be downloaded from:
 - (MailBackServices -> Consolidated Account Statement - CAMS+Karvy+FTAMIL+SBFS -> Detailed Statement with long time period).
 
 Future Enhancements:
-- Move URL parsing and CSV generation functions to Perl Modules
+- Move URL parsing and XLS generation functions to Perl Modules
 - Add options to keep track of NAVs for each day
-- Enhance generation of CSV to XLS for better readability
