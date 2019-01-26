@@ -103,8 +103,7 @@ sub processCAMS {
   my $fundDate;
 
   if(not defined $textFile) {
-    $textFile = $camsPdf;
-    $textFile =~ s/.pdf//;
+    $textFile = "/tmp/$ENV{USER}_mf_camspdf.txt";
   }
 
   system("pdftotext -raw -q -upw $pwd $camsPdf $textFile");
