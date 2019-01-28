@@ -7,8 +7,7 @@ use Excel::Writer::XLSX;
 use Excel::Writer::XLSX::Utility;
 use Getopt::Long;
 use Data::Dumper;
-use LWP::Simple qw(get);
-
+ 
 my $url  = "https://www.amfiindia.com/spages/NAVAll.txt";
 my $cams = "$ENV{HOME}/CAMS.pdf";
 my $pwd  = "123456";
@@ -47,7 +46,7 @@ my ($latestNav, $codeMapping) = getLatestNAV();
 processCAMS($cams, $latestNav, $codeMapping);
 
 sub getLatestNAV {
-  my @navall = split /\n/, get $url;
+  my @navall = split /\n/, `curl --silent $url`;
   @navall = grep !/^\s*$/, @navall;
   chomp @navall;
   foreach(@navall) {
@@ -117,6 +116,8 @@ sub processCAMS {
     chomp($_);
     push @text, $_;
   }
+
+  close FILE;
   
   my %fund;
   my $fund_name;
