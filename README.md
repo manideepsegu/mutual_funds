@@ -4,11 +4,11 @@ Perl code to get latest NAVs, process CAMS PDF and generate a XLSX summary
 Required Perl Modules:
 - Getopt::Long
 - Data::Dumper
-- LWP::Simple
 - Excel::Writer
  
 Unix:
 - pdftotext
+- curl
 
 Options:
 - url       =>      Specify different URL for latest NAVs other than AMF (Optional)
