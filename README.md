@@ -8,6 +8,7 @@ Required Perl Modules:
  
 Unix:
 - pdftotext
+- curl
 
 Options:
 - url       =>      Specify different URL for latest NAVs other than AMF (Optional)
