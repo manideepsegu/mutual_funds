@@ -106,7 +106,7 @@ sub processCAMS {
     $textFile = "/tmp/$ENV{USER}_mf_camspdf.txt";
   }
 
-  system("pdftotext -raw -q -upw $pwd $camsPdf $textFile");
+  system("pdftotext -layout -nopgbrk -q -upw $pwd $camsPdf $textFile");
   
   open(FILE, "<", $textFile) or die $!;
   
@@ -124,8 +124,13 @@ sub processCAMS {
   foreach(@text) {
     my $txt = $_;
     $txt =~ s/\\n//;
-    if($txt =~ /KYC: /) {
-      my $fund_info = $text[$i+1];
+    if($txt =~ /Registrar/) {
+      my $fund_info;
+      if($text[$i] =~ /[\w\d]-\w/) {
+        $fund_info = $text[$i];
+      } else {
+        $fund_info = "$text[$i+1] $text[$i]";
+      }
       my @fund_info = split /-/, $fund_info, 2;
       $fund_name = $fund_info[1];
       if($fund_name !~ /(direct|regular)/i) {
@@ -143,9 +148,9 @@ sub processCAMS {
       $fund_code = getFundCode($fund_name, $codeMapping);
     }
     if(($txt =~ /^[0-3][0-9]-\w+-\d\d\d\d/) && (($txt =~ /Purchase/i) || ($txt =~ /Investment/i) || ($txt =~ /Subscription/i))){
-      $txt =~ /^([0-3][0-9]-\w+-\d\d\d\d) ([\d,.()]+) /;
-      my $date = $1;
-      my $amount = $2;
+      my @tempTxt = split /\s+/, $txt;
+      my $date = $tempTxt[0];
+      my $amount = $tempTxt[-4];
       if($amount =~ /\((.*)\)/) {
         $amount = "-$1";
       }
@@ -156,7 +161,7 @@ sub processCAMS {
         delete $fund{$fund_code}{purchase}{$date};
       }
     }
-    if($txt =~ /Valuation on ([0-3][0-9]-\w+-\d\d\d\d): INR ([\d,.()]+)/) {
+    if($txt =~ /Valuation on ([0-3][0-9]-\w+-\d\d\d\d): INR \s*([\d,.()]+)/) {
       $fundDate = $1;
       my $amount = $2;
       $amount =~ s/,//;
@@ -169,6 +174,8 @@ sub processCAMS {
     }
     $i++;
   }
+
+  sanityCheck(\%fund);
 
   # Create a new Excel workbook
   my $workbook = Excel::Writer::XLSX->new( $csv ) or die $!;
@@ -291,4 +298,14 @@ sub array_search {
       return $_; 
     } 
   } return -1;	
+}
+
+sub sanityCheck {
+  my $fund = shift @_;
+
+  foreach (keys %{$fund}) {
+    if((!exists $fund->{$_}{total_value}) || (!exists $fund->{$_}{present_value}) || (!exists $fund->{$_}{purchase}) || (!exists $fund->{$_}{units})) {
+      die "Missing data for fund $_";
+    }
+  }
 }
