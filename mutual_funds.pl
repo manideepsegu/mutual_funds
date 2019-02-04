@@ -206,7 +206,7 @@ sub processCAMS {
   for(my $i=0; $i<=$#headers; $i++) {
     $worksheet->set_column($i,$i,$width[$i]);
   }
-  foreach my $fund (keys %fund) {
+  foreach my $fund (sort keys %fund) {
     $row++;
     if($fund{$fund}{units}) {
       $worksheet->write( $row, $column, $fund, $format );
