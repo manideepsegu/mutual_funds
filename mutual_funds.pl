@@ -9,13 +9,13 @@ use Getopt::Long;
 use Data::Dumper;
  
 my $url  = "https://www.amfiindia.com/spages/NAVAll.txt";
-my $cams = "$ENV{HOME}/CAMS.pdf";
+my @cams;
 my $pwd  = "123456";
 my $csv  = "$ENV{HOME}/mutual_funds.xlsx";
 my $textFile;
 
 GetOptions ("url=s"       => \$url, 
-            "cams=s"      => \$cams,
+            "cams=s"      => \@cams,
             "pwd=s"       => \$pwd,
             "xlsx=s"      => \$csv,
             "help"        => \&help_msg)
@@ -41,9 +41,13 @@ my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
 $year = $year+1900;
 my $today="$mday-$months[$mon]-$year";
 
+if(!@cams) {
+  push @cams, "$ENV{HOME}/CAMS.pdf";
+}
+
 my ($latestNav, $codeMapping) = getLatestNAV();
 
-processCAMS($cams, $latestNav, $codeMapping);
+processCAMS(\@cams, $latestNav, $codeMapping);
 
 sub getLatestNAV {
   my @navall = split /\n/, `curl --silent $url`;
@@ -105,18 +109,20 @@ sub processCAMS {
     $textFile = "/tmp/$ENV{USER}_mf_camspdf.txt";
   }
 
-  system("pdftotext -layout -nopgbrk -q -upw $pwd $camsPdf $textFile");
-  
-  open(FILE, "<", $textFile) or die $!;
-  
   my @text;
-  
-  while(<FILE>){
-    chomp($_);
-    push @text, $_;
-  }
+    
+  foreach my $pdf (@{$camsPdf}) {
+    system("pdftotext -layout -nopgbrk -q -upw $pwd $pdf $textFile");
+    
+    open(FILE, "<", $textFile) or die $!;
+    
+    while(<FILE>){
+      chomp($_);
+      push @text, $_;
+    }
 
-  close FILE;
+    close FILE;
+  }
   
   my %fund;
   my $fund_name;

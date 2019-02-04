@@ -18,7 +18,7 @@ Options:
 - help      =>      Print this message
 
 Example:
-- mutual_funds.pl -cams CAMS.pdf -pwd qwerty -xlsx latest_summary.xlsx
+- perl mutual_funds/mutual_funds.pl -cams $HOME/MF_Summary/CAMS_mail1.pdf -cams $HOME/MF_Summary/CAMS_mail2.pdf -xlsx $HOME/MF_Summary/CAMS.xlsx
 
 CAMS Statement can be downloaded from:
 - https://www.camsonline.com/COL_InvestorServices.aspx 
