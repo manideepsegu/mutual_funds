@@ -10,15 +10,17 @@ Unix:
 - pdftotext
 - curl
 
+Usage:
+- perl mutual_funds.pl -pwd <password> -xlsx <summary> <statement1.pdf> <statement2.pdf> ...
+
 Options:
 - url       =>      Specify different URL for latest NAVs other than AMF (Optional)
-- cams      =>      Path for the CAMS PDF file. Defaults to \$HOME/CAMS.pdf
 - pwd       =>      Password for CAMS PDF. Defaults to 123456
 - xlsx      =>      Path for final XLSX file. Defaults to \$HOME/mutual_funds.xlsx
 - help      =>      Print this message
 
 Example:
-- perl mutual_funds/mutual_funds.pl -cams $HOME/MF_Summary/CAMS_mail1.pdf -cams $HOME/MF_Summary/CAMS_mail2.pdf -xlsx $HOME/MF_Summary/CAMS.xlsx
+- perl mutual_funds/mutual_funds.pl -xlsx $HOME/MF_Summary/CAMS.xlsx $HOME/MF_Summary/CAMS_mail1.pdf $HOME/MF_Summary/CAMS_mail2.pdf
 
 CAMS Statement can be downloaded from:
 - https://www.camsonline.com/COL_InvestorServices.aspx 

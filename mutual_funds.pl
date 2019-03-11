@@ -15,7 +15,6 @@ my $csv  = "$ENV{HOME}/mutual_funds.xlsx";
 my $textFile;
 
 GetOptions ("url=s"       => \$url, 
-            "cams=s"      => \@cams,
             "pwd=s"       => \$pwd,
             "xlsx=s"      => \$csv,
             "help"        => \&help_msg)
@@ -24,15 +23,22 @@ or help_msg();
 sub help_msg {
   print "\n===================================   mutual_funds.pl   ======================================\n\n";
   print "Script to process latest NAV from AMF website and process CAMS file to generate a XLS summary\n\n";
+  print "Usage:\n";
+  print "\tperl mutual_funds.pl -pwd <password> -xlsx <summary> <statement1.pdf> <statement2.pdf> ...\n\n";
   print "Options:\n";
   print "\turl       =>      Specify different URL for latest NAVs other than AMF (Optional)\n";
-  print "\tcams      =>      Path for the CAMS PDF file. Defaults to \$HOME/CAMS.pdf\n";
   print "\tpwd       =>      Password for CAMS PDF. Defaults to 123456\n";
   print "\txlsx      =>      Path for final XLSX file. Defaults to \$HOME/mutual_funds.xlsx\n";
   print "\thelp      =>      Print this message\n";
-  print "\nExample:\n\tperl mutual_funds.pl -cams CAMS.pdf -pwd qwerty -xlsx latest_summary.xlsx\n";
+  print "\nExample:\n\tperl mutual_funds.pl -pwd qwerty -xlsx latest_summary.xlsx CAMS.pdf \n";
   print "\nContact:\n\tManideep Segu (msegu\@gmail.com)\n\n";
   exit 1;
+}
+
+if (@ARGV > 0) {
+  while (@ARGV) {
+    push @cams, shift @ARGV;
+  }
 }
 
 my @months = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
