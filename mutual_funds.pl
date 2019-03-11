@@ -85,6 +85,7 @@ sub getLatestNAV {
       if($temp[$fundNameIdx] !~ /(direct|regular)/i) {
         $temp[$fundNameIdx] = $temp[$fundNameIdx] . " Regular";
       }
+      $temp[$fundNameIdx] =~ s/Mid Cap/Midcap/;
       $fundData{$temp[$fundCodeIdx]}{parentFund}  = $parentFund;
       $fundData{$temp[$fundCodeIdx]}{name}        = $temp[$fundNameIdx];
       $fundData{$temp[$fundCodeIdx]}{date}        = $temp[$fundDateIdx];
@@ -147,6 +148,8 @@ sub processCAMS {
       $fund_name =~ s/reinvest//i;
       $fund_name =~ s/\((.*?(direct|regular).*?)\)/ - $1 -/i;
       $fund_name =~ s/\(.*?\)//;
+      $fund_name =~ s/\(//;
+      $fund_name =~ s/\)//;
       $fund_name =~ s/Registrar\s*:\s*\w*//;
       $fund_name =~ s/-/ - /g;
       $fund_name =~ s/\s+/ /g;
@@ -246,6 +249,7 @@ sub processCAMS {
 
 sub getFundCode {
   my ($name, $mapping) = @_;
+  $name =~ s/ erstwhile.*$//;
   my @name = split /[ -]+/, $name;
   my $code;
   my %fundCodeMatching;
@@ -278,6 +282,7 @@ sub getFundCode {
     return $code;
   } else {
     print "Not able to find scheme code for $name\n";
+    exit;
   }
 }
 
