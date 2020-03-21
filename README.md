@@ -11,7 +11,9 @@ Unix:
 - curl
 
 Usage:
-- perl mutual_funds.pl -pwd \<password\> -xlsx \<summary\> \<statement1.pdf\> \<statement2.pdf\> ...
+```
+perl mutual_funds.pl -pwd <password> -xlsx <summary> <statement1.pdf> <statement2.pdf> ...
+```
 
 Options:
 - url       =>      Specify different URL for latest NAVs other than AMF (Optional)
